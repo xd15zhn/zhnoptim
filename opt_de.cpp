@@ -1,5 +1,8 @@
-#include "algorithm.hpp"
+#include "zhnoptim.hpp"
 NAMESPACE_ZHNOPTIM_L
+
+Differential_Evolution::~Differential_Evolution() {}
+void Differential_Evolution::Set_Param(double F, double CR) { _F=F;_CR=CR; }
 
 /***********************
 Differential Evolution algorithm initialize

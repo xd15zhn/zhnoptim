@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iomanip>
 
+#define ZHNMAT_VERSION                "1.0.1"
 #define INFINITE                      1e12
 #define EPSILON                       1e-12
 #define ABS(x)                        ((x)>=0?(x):-(x))
@@ -29,11 +30,11 @@ public:
         BOTHOR  // Iteration terminates when condition EPS or COUNT is satisfied.
     };
     Algorithm(const std::vector<double>& solution, int solvelen=0);
-    virtual ~Algorithm() {};
-    void Set_CostFunction(double(*f)(const std::vector<double>& solution)) { _costFunc=f; };
+    virtual ~Algorithm();
+    void Set_CostFunction(double(*f)(const std::vector<double>& solution));
     void Set_TerminationConditions(double mincost, int maxiterate, TermCriteria type=EPS);
-    double Get_Cost() const { return _MinCost; };
-    std::vector<double> Get_BestSolution() const { return _BestSolution; };
+    double Get_Cost() const;
+    std::vector<double> Get_BestSolution() const;
     void Solution_Print() const;
     virtual void run() = 0;
 protected:
@@ -52,9 +53,9 @@ Differential Evolution(DE/best/2)
 class Differential_Evolution: public Algorithm{
 public:
     Differential_Evolution(const std::vector<double>& solution, int solvelen=1, int popsize=15);
-    virtual ~Differential_Evolution() {};
+    virtual ~Differential_Evolution();
     virtual void run();
-    void Set_Param(double F, double CR) { _F=F;_CR=CR; };
+    void Set_Param(double F, double CR);
 private:
     std::vector<std::vector<double>> population;
     std::vector<double> mutant, offspring;
@@ -75,9 +76,9 @@ Pattern Search
 class Pattern_Search: public Algorithm{
 public:
     Pattern_Search(const std::vector<double>& solution, int solvelen=0, double deltaStart=0.25);
-    virtual ~Pattern_Search() {};
+    virtual ~Pattern_Search();
     virtual void run();
-    void Set_Param(double deltaStart) { _delta = deltaStart; };
+    void Set_Param(double deltaStart);
 private:
     double _delta;
 };

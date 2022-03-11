@@ -1,4 +1,10 @@
-#include "ZHNOPTIM.hpp"
+#include "zhnoptim.hpp"
+NAMESPACE_ZHNOPTIM_L
+
+Algorithm::~Algorithm() {}
+void Algorithm::Set_CostFunction(double(*f)(const std::vector<double>& solution)) { _costFunc=f; }
+double Algorithm::Get_Cost() const { return _MinCost; }
+std::vector<double> Algorithm::Get_BestSolution() const { return _BestSolution; }
 
 /***********************
 Algorithm initialize
@@ -29,3 +35,5 @@ void Algorithm::Solution_Print() const
         std::cout<<_BestSolution[i]<<", ";
     std::cout<<std::endl;
 }
+
+NAMESPACE_ZHNOPTIM_R
