@@ -1,7 +1,4 @@
 cmake_minimum_required(VERSION 3.12)
 project(algorithm)
 set(CMAKE_BUILD_TYPE release)
-add_library(${CMAKE_PROJECT_NAME}_lib STATIC opt_de.cpp opt_ps.cpp)
-#set(PROJECT_SOURCES main.cpp opt_de.cpp opt_ps.cpp)
-#add_executable(${CMAKE_PROJECT_NAME}_exe ${PROJECT_SOURCES})
-#target_link_libraries(${CMAKE_PROJECT_NAME}_exe ${CMAKE_SOURCE_DIR}/zhnmat.a)
+add_library(${CMAKE_PROJECT_NAME} STATIC opt_de.cpp opt_ps.cpp)
