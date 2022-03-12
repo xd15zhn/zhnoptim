@@ -10,9 +10,10 @@ Differential Evolution algorithm initialize
 *@ solvelen: Length of solution vector
 *@ popsize: number of the population
 **********************/
-Differential_Evolution::Differential_Evolution(const std::vector<double> &solution, int solvelen, int popsize)
-    : Algorithm(solution, solvelen)
+Differential_Evolution::Differential_Evolution(const std::vector<double> &solution, int popsize)
+    : Algorithm(solution)
 {
+    _solvelen = solution.size();
     gen = std::default_random_engine((unsigned int)time(0));
     NormDis = std::normal_distribution<double>(0, 1);
     UniFloatDis = std::uniform_real_distribution<double>(0, 1);
@@ -34,15 +35,16 @@ void Differential_Evolution::run()
 {
     bool finished = false;
     std::cout << "Differential Evalution begins." << std::endl;
-    _MinCost = _costFunc(population[0]);
+    _MinCost = _costFunc->Function(population[0]);
     _BestSolution = population[0];
     for (short i = 1; i < _solvelen; i++) {
-        fit1 = _costFunc(population[i]);
+        fit1 = _costFunc->Function(population[0]);
         if (fit1 < _MinCost) {
             _MinCost = fit1;
             _BestSolution = population[i];
         }
     }
+    Solution_Print();
     do {
         for (short i = 0; i < _popsize; i++) {
             /*变异:使每个个体变异产生变异个体*/
@@ -60,8 +62,8 @@ void Differential_Evolution::run()
                     offspring[j] = mutant[j];
             }
             /*选择:后代个体与原个体竞争并保留优胜个体*/
-            fit1 = _costFunc(population[i]);
-            fit2 = _costFunc(offspring);
+            fit1 = _costFunc->Function(population[i]);
+            fit2 = _costFunc->Function(offspring);
             if (fit2 < fit1) {
                 for (short j = 0; j < _solvelen; j++)
                     population[i][j] = offspring[j];

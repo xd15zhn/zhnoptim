@@ -7,10 +7,10 @@
 #include <cmath>
 #include <iomanip>
 
-#define ZHNMAT_VERSION                "1.0.1"
-#define INFINITE                      1e12
-#define EPSILON                       1e-12
-#define ABS(x)                        ((x)>=0?(x):-(x))
+#define ZHNOPTIM_VERSION              "1.0.3"
+#define ZHNOPTIM_INFINITE             1e12
+#define ZHNOPTIM_EPSILON              1e-12
+#define ZHNOPTIM_ABS(x)               ((x)>=0?(x):-(x))
 #ifndef PRINT_NAME_VALUE
 #define PRINT_NAME_VALUE(x)           std::cout<<#x<<": "<<x<<std::endl;
 #endif
@@ -20,8 +20,17 @@
 #define NAMESPACE_ZHNOPTIM_R          }
 NAMESPACE_ZHNOPTIM_L
 
+/**********************
+Used to provide another method to replace the pointer to a function.
+**********************/
+class UserFunc
+{
+public:
+    virtual double Function(const std::vector<double>& u) {return u[0];};
+};
 
-class Algorithm{
+class Algorithm
+{
 public:
     enum TermCriteria{  // Termination criteria
         EPS,  // Iteration terminates when the cost is less than a certain value.
@@ -29,18 +38,17 @@ public:
         BOTHAND,  // Iteration terminates when both conditions EPS and COUNT are satisfied.
         BOTHOR  // Iteration terminates when condition EPS or COUNT is satisfied.
     };
-    Algorithm(const std::vector<double>& solution, int solvelen=0);
+    Algorithm(const std::vector<double>& solution);
     virtual ~Algorithm();
-    void Set_CostFunction(double(*f)(const std::vector<double>& solution));
+    void Set_CostFunction(UserFunc *f);
     void Set_TerminationConditions(double mincost, int maxiterate, TermCriteria type=EPS);
     double Get_Cost() const;
     std::vector<double> Get_BestSolution() const;
     void Solution_Print() const;
     virtual void run() = 0;
 protected:
-    int _solvelen;  // Length of solution vector
     int _IterateCnt, _TermIterate;  // Current and total number of iterations
-    double(*_costFunc)(const std::vector<double>& solution);
+    UserFunc *_costFunc;
     TermCriteria TermType;
     double _TermCost, _MinCost;  // Current and minimum cost value
     std::vector<double> _BestSolution;
@@ -50,13 +58,15 @@ protected:
 /***********************
 Differential Evolution(DE/best/2)
 **********************/
-class Differential_Evolution: public Algorithm{
+class Differential_Evolution: public Algorithm
+{
 public:
-    Differential_Evolution(const std::vector<double>& solution, int solvelen=1, int popsize=15);
+    Differential_Evolution(const std::vector<double>& solution, int popsize=15);
     virtual ~Differential_Evolution();
     virtual void run();
     void Set_Param(double F, double CR);
 private:
+    int _solvelen;
     std::vector<std::vector<double>> population;
     std::vector<double> mutant, offspring;
     int _popsize;  // number of the population
@@ -75,11 +85,12 @@ Pattern Search
 **********************/
 class Pattern_Search: public Algorithm{
 public:
-    Pattern_Search(const std::vector<double>& solution, int solvelen=0, double deltaStart=0.25);
+    Pattern_Search(const std::vector<double>& solution, double deltaStart=0.25);
     virtual ~Pattern_Search();
     virtual void run();
     void Set_Param(double deltaStart);
 private:
+    int _solvelen;
     double _delta;
 };
 
