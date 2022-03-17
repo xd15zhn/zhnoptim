@@ -1,11 +1,7 @@
 #ifndef __ZHNOPTIM_H
 #define __ZHNOPTIM_H
-#include <iostream>
 #include <vector>
 #include <random>
-#include <ctime>
-#include <cmath>
-#include <iomanip>
 
 #define ZHNOPTIM_VERSION              "1.0.3"
 #define ZHNOPTIM_INFINITE             1e12

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "zhnoptim.hpp"
 NAMESPACE_ZHNOPTIM_L
 

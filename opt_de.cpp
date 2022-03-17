@@ -1,3 +1,5 @@
+#include <random>
+#include <ctime>
 #include "zhnoptim.hpp"
 NAMESPACE_ZHNOPTIM_L
 
@@ -34,11 +36,10 @@ Differential_Evolution::Differential_Evolution(const std::vector<double> &soluti
 void Differential_Evolution::run()
 {
     bool finished = false;
-    std::cout << "Differential Evalution begins." << std::endl;
     _MinCost = _costFunc->Function(population[0]);
     _BestSolution = population[0];
     for (short i = 1; i < _solvelen; i++) {
-        fit1 = _costFunc->Function(population[0]);
+        fit1 = _costFunc->Function(population[i]);
         if (fit1 < _MinCost) {
             _MinCost = fit1;
             _BestSolution = population[i];
