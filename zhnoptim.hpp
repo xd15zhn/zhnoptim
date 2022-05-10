@@ -3,7 +3,7 @@
 #include <vector>
 #include <random>
 
-#define ZHNOPTIM_VERSION              "1.0.4"
+#define ZHNOPTIM_VERSION              "1.0.5"
 #define ZHNOPTIM_INFINITE             1e12
 #define ZHNOPTIM_EPSILON              1e-12
 #define ZHNOPTIM_ABS(x)               ((x)>=0?(x):-(x))
@@ -15,6 +15,18 @@
 #define NAMESPACE_ZHNOPTIM_L          namespace zhnoptim {
 #define NAMESPACE_ZHNOPTIM_R          }
 NAMESPACE_ZHNOPTIM_L
+
+enum TermCriteria {  // Termination criteria
+    EPS,  // Iteration terminates when the cost is less than a certain value.
+    COUNT,  // Iteration terminates after a certain number of times.
+    BOTHAND,  // Iteration terminates when both conditions EPS and COUNT are satisfied.
+    BOTHOR,  // Iteration terminates when condition EPS or COUNT is satisfied.
+};
+enum PRINT_FORMAT {  // When the best solution is printed.
+    NO_PRINT,  // Donnot print.
+    PRINT_ITERATE,  // Print after every iterate step.
+    PRINT_UPDATE,  // Print when a new best solution is found.
+};
 
 /**********************
 Used to provide another method to replace the pointer to a function.
@@ -28,17 +40,6 @@ public:
 class Algorithm
 {
 public:
-    enum TermCriteria {  // Termination criteria
-        EPS,  // Iteration terminates when the cost is less than a certain value.
-        COUNT,  // Iteration terminates after a certain number of times.
-        BOTHAND,  // Iteration terminates when both conditions EPS and COUNT are satisfied.
-        BOTHOR,  // Iteration terminates when condition EPS or COUNT is satisfied.
-    };
-    enum PRINT_FORMAT {  // When the best solution is printed.
-        NO_PRINT,  // Donnot print.
-        PRINT_ITERATE,  // Print after every iterate step.
-        PRINT_UPDATE,  // Print when a new best solution is found.
-    };
     Algorithm(const std::vector<double>& solution);
     virtual ~Algorithm();
     void Set_CostFunction(UserFunc *f);
@@ -48,12 +49,14 @@ public:
     void Solution_Print(int mode) const;
     virtual void run() = 0;
     PRINT_FORMAT _printformat = PRINT_UPDATE;
+    bool _printfile = false;
 protected:
     int _IterateCnt, _TermIterate;  // Current and total number of iterations
     UserFunc *_costFunc;
     TermCriteria TermType;
     double _TermCost, _MinCost;  // Current and minimum cost value
     std::vector<double> _BestSolution;
+    std::fstream *_fp;
 };
 
 
