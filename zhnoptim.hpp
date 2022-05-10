@@ -3,7 +3,7 @@
 #include <vector>
 #include <random>
 
-#define ZHNOPTIM_VERSION              "1.0.3"
+#define ZHNOPTIM_VERSION              "1.0.4"
 #define ZHNOPTIM_INFINITE             1e12
 #define ZHNOPTIM_EPSILON              1e-12
 #define ZHNOPTIM_ABS(x)               ((x)>=0?(x):-(x))
@@ -28,20 +28,26 @@ public:
 class Algorithm
 {
 public:
-    enum TermCriteria{  // Termination criteria
+    enum TermCriteria {  // Termination criteria
         EPS,  // Iteration terminates when the cost is less than a certain value.
         COUNT,  // Iteration terminates after a certain number of times.
         BOTHAND,  // Iteration terminates when both conditions EPS and COUNT are satisfied.
-        BOTHOR  // Iteration terminates when condition EPS or COUNT is satisfied.
+        BOTHOR,  // Iteration terminates when condition EPS or COUNT is satisfied.
+    };
+    enum PRINT_FORMAT {  // When the best solution is printed.
+        NO_PRINT,  // Donnot print.
+        PRINT_ITERATE,  // Print after every iterate step.
+        PRINT_UPDATE,  // Print when a new best solution is found.
     };
     Algorithm(const std::vector<double>& solution);
     virtual ~Algorithm();
     void Set_CostFunction(UserFunc *f);
-    void Set_TerminationConditions(double mincost, int maxiterate, TermCriteria type=EPS);
+    void Set_TerminationConditions(double mincost, int maxiterate, TermCriteria type=COUNT);
     double Get_Cost() const;
     std::vector<double> Get_BestSolution() const;
-    void Solution_Print() const;
+    void Solution_Print(int mode) const;
     virtual void run() = 0;
+    PRINT_FORMAT _printformat = PRINT_UPDATE;
 protected:
     int _IterateCnt, _TermIterate;  // Current and total number of iterations
     UserFunc *_costFunc;
@@ -57,7 +63,7 @@ Differential Evolution(DE/best/2)
 class Differential_Evolution: public Algorithm
 {
 public:
-    Differential_Evolution(const std::vector<double>& solution, int popsize=15);
+    Differential_Evolution(const std::vector<double>& solution, int popsizeeach=15);
     virtual ~Differential_Evolution();
     virtual void run();
     void Set_Param(double F, double CR);

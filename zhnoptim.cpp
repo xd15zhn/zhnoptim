@@ -28,12 +28,14 @@ void Algorithm::Set_TerminationConditions(double mincost, int maxiterate, TermCr
     _TermCost = mincost; _TermIterate = maxiterate; TermType = type;
 }
 
-void Algorithm::Solution_Print() const
+void Algorithm::Solution_Print(int mode) const
 {
-    std::cout<<_MinCost<<": ";
+    if (mode == 0) return;
+    std::cout << _MinCost << "  ";
+    if (mode == 1) return;
     for (int i=0; i<_BestSolution.size(); ++i)
-        std::cout<<_BestSolution[i]<<", ";
-    std::cout<<std::endl;
+        std::cout << _BestSolution[i] << ", ";
+    std::cout << std::endl;
 }
 
 NAMESPACE_ZHNOPTIM_R

@@ -12,7 +12,7 @@ Differential Evolution algorithm initialize
 *@ solvelen: Length of solution vector
 *@ popsize: number of the population
 **********************/
-Differential_Evolution::Differential_Evolution(const std::vector<double> &solution, int popsize)
+Differential_Evolution::Differential_Evolution(const std::vector<double> &solution, int popsizeeach)
     : Algorithm(solution)
 {
     _solvelen = solution.size();
@@ -20,11 +20,11 @@ Differential_Evolution::Differential_Evolution(const std::vector<double> &soluti
     NormDis = std::normal_distribution<double>(0, 1);
     UniFloatDis = std::uniform_real_distribution<double>(0, 1);
     UniIntDis = std::uniform_int_distribution<unsigned>(0, _solvelen - 1);
-    _popsize = popsize;
+    _popsize = popsizeeach * _solvelen;
     _F = _CR = 0.5;
     mutant = offspring = _BestSolution;
     population.push_back(_BestSolution);
-    for (int i = 1; i < popsize; ++i){
+    for (int i = 1; i < _popsize; ++i){
         population.push_back(_BestSolution);
         for (int j=0; j<_solvelen; ++j) {
             fit1 = NormDis(gen);
@@ -45,7 +45,7 @@ void Differential_Evolution::run()
             _BestSolution = population[i];
         }
     }
-    Solution_Print();
+    Solution_Print(_printformat);
     do {
         for (short i = 0; i < _popsize; i++) {
             /*变异:使每个个体变异产生变异个体*/
@@ -71,10 +71,11 @@ void Differential_Evolution::run()
                 if (fit2 < _MinCost) {
                     _MinCost = fit2;
                     _BestSolution = population[i];
-                    Solution_Print();
+                    Solution_Print(_printformat==PRINT_UPDATE ? 2:0);
                 }
             }
         }
+        Solution_Print(_printformat==PRINT_ITERATE ? 1:0);
         _IterateCnt++;
         switch (TermType){
         case EPS: finished = _MinCost <= _TermCost; break;
