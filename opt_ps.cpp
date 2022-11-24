@@ -15,7 +15,6 @@ void Pattern_Search::run()
 {
     _MinCost = _costFunc->Function(_BestSolution);
     double tempCost, oldCost = _MinCost;
-    Solution_Print(_printformat);
     do {
         for (short i = 0; i < _solvelen; i++) {
             _BestSolution[i] += _delta;
@@ -32,13 +31,8 @@ void Pattern_Search::run()
             else
                 _MinCost = tempCost;
         }
-        if (_MinCost >= oldCost)
-            _delta /= 2;
-        else{
-            Solution_Print(_printformat==PRINT_UPDATE ? 2:0);
-            oldCost = _MinCost;
-        }
-        Solution_Print(_printformat==PRINT_ITERATE ? 1:0);
+        if (_MinCost >= oldCost) _delta /= 2;
+        else oldCost = _MinCost;
     } while (_delta>ZHNOPTIM_EPSILON);
 }
 

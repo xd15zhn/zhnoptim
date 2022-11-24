@@ -30,61 +30,49 @@ Differential_Evolution::Differential_Evolution(const std::vector<double> &soluti
     }
 }
 
-void Differential_Evolution::run()
-{
-    bool finished = false;
-    double fit1, fit2;  // 适应度值
-    int in1, in2;  // 2个差分向量的个体编号
-    std::vector<double> mutant, offspring;
+void Differential_Evolution::Initialize() {
+    double fit;
     _MinCost = _costFunc->Function(_population[0]);
     _BestSolution = _population[0];
     for (short i = 1; i < _solvelen; i++) {
-        fit1 = _costFunc->Function(_population[i]);
-        if (fit1 < _MinCost) {
-            _MinCost = fit1;
+        fit = _costFunc->Function(_population[i]);
+        if (fit < _MinCost) {
+            _MinCost = fit;
             _BestSolution = _population[i];
         }
     }
-    Solution_Print(_printformat);
-    do {
-        for (short i = 0; i < _popsize; i++) {
-            /*变异:使每个个体变异产生变异个体*/
-            in1 = rand() % _solvelen;
-            in2 = rand() % _solvelen;
-            for (short j = 0; j < _solvelen; j++) {
-                _F = (rand()+1.0) / (RAND_MAX+1.0);
-                mutant[j] = _population[i][j] + _F*(_population[in1][j] - _population[in2][j]);
-            }
-            /*交叉:变异个体与原个体交叉产生后代个体*/
-            for (short j = 0; j < _solvelen; j++) {
-                if ((rand()+1.0) / (RAND_MAX+1.0) > _CR)
-                    offspring[j] = _population[i][j];
-                else
-                    offspring[j] = mutant[j];
-            }
-            /*选择:后代个体与原个体竞争并保留优胜个体*/
-            fit1 = _costFunc->Function(_population[i]);
-            fit2 = _costFunc->Function(offspring);
-            if (fit2 < fit1) {
-                for (short j = 0; j < _solvelen; j++)
-                    _population[i][j] = offspring[j];
-                if (fit2 < _MinCost) {
-                    _MinCost = fit2;
-                    _BestSolution = _population[i];
-                    Solution_Print(_printformat==PRINT_UPDATE ? 2:0);
-                }
+}
+void Differential_Evolution::Optimize_OneStep() {
+    std::vector<double> mutant, offspring;
+    double fit1, fit2;  // 适应度值
+    int in1, in2;  // 2个差分向量的个体编号
+    for (short i = 0; i < _popsize; i++) {
+        /*变异:使每个个体变异产生变异个体*/
+        in1 = rand() % _solvelen;
+        in2 = rand() % _solvelen;
+        for (short j = 0; j < _solvelen; j++) {
+            _F = (rand()+1.0) / (RAND_MAX+1.0);
+            mutant[j] = _population[i][j] + _F*(_population[in1][j] - _population[in2][j]);
+        }
+        /*交叉:变异个体与原个体交叉产生后代个体*/
+        for (short j = 0; j < _solvelen; j++) {
+            if ((rand()+1.0) / (RAND_MAX+1.0) > _CR)
+                offspring[j] = _population[i][j];
+            else
+                offspring[j] = mutant[j];
+        }
+        /*选择:后代个体与原个体竞争并保留优胜个体*/
+        fit1 = _costFunc->Function(_population[i]);
+        fit2 = _costFunc->Function(offspring);
+        if (fit2 < fit1) {
+            for (short j = 0; j < _solvelen; j++)
+                _population[i][j] = offspring[j];
+            if (fit2 < _MinCost) {
+                _MinCost = fit2;
+                _BestSolution = _population[i];
             }
         }
-        Solution_Print(_printformat==PRINT_ITERATE ? 1:0);
-        _IterateCnt++;
-        switch (TermType){
-        case EPS: finished = _MinCost <= _TermCost; break;
-        case COUNT: finished = _IterateCnt >= _TermIterate; break;
-        case BOTHAND: finished = (_MinCost <= _TermCost) && (_IterateCnt >= _TermIterate); break;
-        case BOTHOR: finished = (_MinCost <= _TermCost) || (_IterateCnt >= _TermIterate); break;
-        default: finished = false; break;
-        }
-    } while (!finished);
+    }
 }
 
 NAMESPACE_ZHNOPTIM_R

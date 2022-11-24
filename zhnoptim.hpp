@@ -14,18 +14,6 @@
 #define NAMESPACE_ZHNOPTIM_R          }
 NAMESPACE_ZHNOPTIM_L
 
-enum TermCriteria {  // Termination criteria
-    EPS,  // Iteration terminates when the cost is less than a certain value.
-    COUNT,  // Iteration terminates after a certain number of times.
-    BOTHAND,  // Iteration terminates when both conditions EPS and COUNT are satisfied.
-    BOTHOR,  // Iteration terminates when condition EPS or COUNT is satisfied.
-};
-enum PRINT_FORMAT {  // When the best solution is printed.
-    NO_PRINT,  // Donnot print.
-    PRINT_ITERATE,  // Print after every iterate step.
-    PRINT_UPDATE,  // Print when a new best solution is found.
-};
-
 /**********************
 Used to provide another method to replace the pointer to a function.
 **********************/
@@ -41,20 +29,12 @@ public:
     Algorithm(const std::vector<double>& solution);
     virtual ~Algorithm();
     void Set_CostFunction(UserFunc *f);
-
-    // 
-    void Set_TerminationConditions(double mincost, int maxiterate, TermCriteria type=COUNT);
-    // 设置输出格式
-    void Set_PrintFormat(PRINT_FORMAT format);
     double Get_Cost() const;
     std::vector<double> Get_BestSolution() const;
-    void Solution_Print(int mode) const;
-    virtual void run() = 0;
+    virtual void Initialize() = 0;
+    virtual void Optimize_OneStep() = 0;
 protected:
-    int _IterateCnt, _TermIterate;  // Current and total number of iterations
     UserFunc *_costFunc;
-    TermCriteria TermType;
-    PRINT_FORMAT _printformat = PRINT_UPDATE;
     double _TermCost, _MinCost;  // Current and minimum cost value
     std::vector<double> _BestSolution;
 };
@@ -68,7 +48,8 @@ class Differential_Evolution: public Algorithm
 public:
     Differential_Evolution(const std::vector<double>& solution, int popsizeeach=15);
     virtual ~Differential_Evolution();
-    virtual void run();
+    virtual void Initialize() override;
+    virtual void Optimize_OneStep() override;
     void Set_Param(double F, double CR);
 private:
     int _solvelen;
@@ -85,7 +66,7 @@ class Pattern_Search: public Algorithm{
 public:
     Pattern_Search(const std::vector<double>& solution, double deltaStart=0.25);
     virtual ~Pattern_Search();
-    virtual void run();
+    void run();
     void Set_Param(double deltaStart);
 private:
     int _solvelen;
