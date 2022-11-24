@@ -15,20 +15,17 @@ Differential Evolution algorithm initialize
 Differential_Evolution::Differential_Evolution(const std::vector<double> &solution, int popsizeeach)
     : Algorithm(solution)
 {
+    double U, V;
     _solvelen = solution.size();
-    gen = std::default_random_engine((unsigned int)time(0));
-    NormDis = std::normal_distribution<double>(0, 1);
-    UniFloatDis = std::uniform_real_distribution<double>(0, 1);
-    UniIntDis = std::uniform_int_distribution<unsigned>(0, _solvelen - 1);
     _popsize = popsizeeach * _solvelen;
     _F = _CR = 0.5;
-    mutant = offspring = _BestSolution;
-    population.push_back(_BestSolution);
+    _population.push_back(_BestSolution);
     for (int i = 1; i < _popsize; ++i){
-        population.push_back(_BestSolution);
+        _population.push_back(_BestSolution);
         for (int j=0; j<_solvelen; ++j) {
-            fit1 = NormDis(gen);
-            population[i][j] = fit1;
+            U = (rand()+1.0) / (RAND_MAX+1.0);
+            V = (rand()+1.0) / (RAND_MAX+1.0);
+            _population[i][j] = sqrt(-2.0 * log(U))* cos(6.283185307179586477 * V);
         }
     }
 }
@@ -36,41 +33,44 @@ Differential_Evolution::Differential_Evolution(const std::vector<double> &soluti
 void Differential_Evolution::run()
 {
     bool finished = false;
-    _MinCost = _costFunc->Function(population[0]);
-    _BestSolution = population[0];
+    double fit1, fit2;  // 适应度值
+    int in1, in2;  // 2个差分向量的个体编号
+    std::vector<double> mutant, offspring;
+    _MinCost = _costFunc->Function(_population[0]);
+    _BestSolution = _population[0];
     for (short i = 1; i < _solvelen; i++) {
-        fit1 = _costFunc->Function(population[i]);
+        fit1 = _costFunc->Function(_population[i]);
         if (fit1 < _MinCost) {
             _MinCost = fit1;
-            _BestSolution = population[i];
+            _BestSolution = _population[i];
         }
     }
     Solution_Print(_printformat);
     do {
         for (short i = 0; i < _popsize; i++) {
             /*变异:使每个个体变异产生变异个体*/
-            in1 = UniIntDis(gen);
-            in2 = UniIntDis(gen);
+            in1 = rand() % _solvelen;
+            in2 = rand() % _solvelen;
             for (short j = 0; j < _solvelen; j++) {
-                _F = UniFloatDis(gen);
-                mutant[j] = population[i][j] + _F*(population[in1][j] - population[in2][j]);
+                _F = (rand()+1.0) / (RAND_MAX+1.0);
+                mutant[j] = _population[i][j] + _F*(_population[in1][j] - _population[in2][j]);
             }
             /*交叉:变异个体与原个体交叉产生后代个体*/
             for (short j = 0; j < _solvelen; j++) {
-                if (UniFloatDis(gen) > _CR)
-                    offspring[j] = population[i][j];
+                if ((rand()+1.0) / (RAND_MAX+1.0) > _CR)
+                    offspring[j] = _population[i][j];
                 else
                     offspring[j] = mutant[j];
             }
             /*选择:后代个体与原个体竞争并保留优胜个体*/
-            fit1 = _costFunc->Function(population[i]);
+            fit1 = _costFunc->Function(_population[i]);
             fit2 = _costFunc->Function(offspring);
             if (fit2 < fit1) {
                 for (short j = 0; j < _solvelen; j++)
-                    population[i][j] = offspring[j];
+                    _population[i][j] = offspring[j];
                 if (fit2 < _MinCost) {
                     _MinCost = fit2;
-                    _BestSolution = population[i];
+                    _BestSolution = _population[i];
                     Solution_Print(_printformat==PRINT_UPDATE ? 2:0);
                 }
             }

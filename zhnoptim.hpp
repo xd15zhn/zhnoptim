@@ -1,9 +1,7 @@
 #ifndef __ZHNOPTIM_H
 #define __ZHNOPTIM_H
 #include <vector>
-#include <random>
 
-#define ZHNOPTIM_VERSION              "1.0.5"
 #define ZHNOPTIM_INFINITE             1e12
 #define ZHNOPTIM_EPSILON              1e-12
 #define ZHNOPTIM_ABS(x)               ((x)>=0?(x):-(x))
@@ -43,20 +41,22 @@ public:
     Algorithm(const std::vector<double>& solution);
     virtual ~Algorithm();
     void Set_CostFunction(UserFunc *f);
+
+    // 
     void Set_TerminationConditions(double mincost, int maxiterate, TermCriteria type=COUNT);
+    // 设置输出格式
+    void Set_PrintFormat(PRINT_FORMAT format);
     double Get_Cost() const;
     std::vector<double> Get_BestSolution() const;
     void Solution_Print(int mode) const;
     virtual void run() = 0;
-    PRINT_FORMAT _printformat = PRINT_UPDATE;
-    bool _printfile = false;
 protected:
     int _IterateCnt, _TermIterate;  // Current and total number of iterations
     UserFunc *_costFunc;
     TermCriteria TermType;
+    PRINT_FORMAT _printformat = PRINT_UPDATE;
     double _TermCost, _MinCost;  // Current and minimum cost value
     std::vector<double> _BestSolution;
-    std::fstream *_fp;
 };
 
 
@@ -72,16 +72,9 @@ public:
     void Set_Param(double F, double CR);
 private:
     int _solvelen;
-    std::vector<std::vector<double>> population;
-    std::vector<double> mutant, offspring;
+    std::vector<std::vector<double>> _population;
     int _popsize;  // number of the population
     double _F, _CR;  // 缩放因子,交叉因子
-    double fit1, fit2;  // 适应度值
-    int in1, in2;  // 2个差分向量的个体编号
-    std::default_random_engine gen;  // 生成初始化种子
-    std::normal_distribution<double> NormDis;  // 正态分布
-    std::uniform_real_distribution<double> UniFloatDis;  // [0,1]均匀分布
-    std::uniform_int_distribution<unsigned> UniIntDis;  // 整数均匀分布
 };
 
 
